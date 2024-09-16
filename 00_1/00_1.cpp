@@ -28,6 +28,33 @@ void OutputMatrD(int** matr, int m, int n)
 		printf("\n");
 	}
 }
+void swap(int& a, int& b)
+{
+	int c;
+	c = a;
+	a = b;
+	b = c;
+}
+int factorial(int a)
+{
+	int k;
+	for (k = 1; a > 1; a--)
+		k = k * a;
+	return k;
+}
+int Perebor(int** matr, int n, int begin)
+{
+	int min = 0; int* massiv;
+	massiv = new int[n-1];
+	for(int k=0; ;)
+		if (k != factorial(n))
+		{
+			for (;;)
+			{
+				k++;
+			}
+		}
+}
 int main()
 {
 	int** matrix;
