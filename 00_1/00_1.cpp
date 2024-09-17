@@ -42,25 +42,50 @@ int factorial(int a)
 		k = k * a;
 	return k;
 }
-int Perebor(int** matr, int n, int begin)
+void Perebor(int** matr, int n, int begin)
 {
-	int min = 0; int* massiv;
+	int m = 1, min = 0, sum = 0;
+	int* massiv;
 	massiv = new int[n-1];
-	for(int k=0; ;)
-		if (k != factorial(n))
+	for (int i = 0; m <= n;m++)
+	{
+		if (begin != m)
 		{
-			for (;;)
-			{
-				k++;
-			}
+			massiv[i] = m;
+			//std::cout << massiv[i] << " ";
+			i++;
 		}
+	}
+	for(int i=0;i<n-1;i++)
+		std::cout << massiv[i] << " ";
+	for (int k=1;/*k != 1 + factorial(n)*/ k!=2;)
+		{
+		int i = 0;
+		int N = massiv[i];
+		sum = matr[begin-1][N-1];
+		i++;
+		std::cout << sum << " ";
+		for (; i < n - 1; i++)
+		{
+			N = massiv[i];
+			sum = sum + matr[N - 2][N - 1];
+			std::cout << sum << " ";
+		}
+		k++;
+		sum = sum + matr[N-1][begin-1];
+		std::cout << sum;
+		}
+	delete[] massiv;
 }
 int main()
 {
 	int** matrix;
-	int Gorod;
+	int Gorod,Begin;
 	std::cout << "Vvedite Kolichestvo gorodov - ";
 	std::cin >> Gorod;
+	puts("");
+	std::cout << "Vvedite gorod-Nachalo ";
+	std::cin >> Begin;
 	puts("");
 	matrix = new int* [Gorod];
 	for (int i = 0; i < Gorod; i++)
@@ -68,4 +93,5 @@ int main()
 	RandMatrD(matrix, Gorod, Gorod, 1, 100);
 	//InputMatrD(matrix, Gorod, Gorod);
 	OutputMatrD(matrix, Gorod, Gorod);
+	Perebor(matrix, Gorod, Begin);
 }
