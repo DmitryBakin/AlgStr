@@ -42,56 +42,58 @@ int factorial(int a)
 		k = k * a;
 	return k;
 }
-void Perebor(int** matr, int n, int begin)
+
+void CreateMassivPuti(int n, int begin, int* massiv)
 {
-	int m = 1, min = 0, sum = 0;
-	int* massiv;
-	massiv = new int[n-1];
-	for (int i = 0; m <= n;m++)
+	int m = 1;
+	massiv[0] = begin;
+	massiv[n] = begin;
+	for (int i = 1; m <= n; m++)
 	{
 		if (begin != m)
 		{
 			massiv[i] = m;
-			//std::cout << massiv[i] << " ";
 			i++;
 		}
 	}
-	for(int i=0;i<n-1;i++)
+	for (int i = 0; i < n + 1; i++)
 		std::cout << massiv[i] << " ";
-	for (int k=1;/*k != 1 + factorial(n)*/ k!=2;)
-		{
-		int i = 0;
-		int N = massiv[i];
-		sum = matr[begin-1][N-1];
-		i++;
-		std::cout << sum << " ";
-		for (; i < n - 1; i++)
-		{
-			N = massiv[i];
-			sum = sum + matr[N - 2][N - 1];
-			std::cout << sum << " ";
-		}
-		k++;
-		sum = sum + matr[N-1][begin-1];
-		std::cout << sum;
-		}
-	delete[] massiv;
+}
+int PricePuti(int** matr, int* massiv, int n, int begin)
+{
+	int sum = 0;
+	for (int i = 1; i < n + 1; i++)
+	{
+		sum = sum + matr[massiv[i - 1] - 1][massiv[i] - 1];
+	}
+	return sum;
+}
+void Perebor(int** matr, int n, int begin)
+{
+
 }
 int main()
 {
 	int** matrix;
 	int Gorod,Begin;
+	int* massiv;
+	
 	std::cout << "Vvedite Kolichestvo gorodov - ";
 	std::cin >> Gorod;
 	puts("");
 	std::cout << "Vvedite gorod-Nachalo ";
 	std::cin >> Begin;
 	puts("");
+	massiv = new int[Gorod + 1];
 	matrix = new int* [Gorod];
 	for (int i = 0; i < Gorod; i++)
 		matrix[i] = new int[Gorod];
 	RandMatrD(matrix, Gorod, Gorod, 1, 100);
 	//InputMatrD(matrix, Gorod, Gorod);
 	OutputMatrD(matrix, Gorod, Gorod);
-	Perebor(matrix, Gorod, Begin);
+	//Perebor(matrix, Gorod, Begin);
+	CreateMassivPuti(Gorod, Begin, massiv);
+	/*int sum = PricePuti(matrix, massiv, Gorod, Begin);
+	std::cout << "\n" << sum;*/
+	delete[] massiv;
 }
