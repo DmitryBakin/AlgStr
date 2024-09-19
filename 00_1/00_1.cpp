@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <iostream>
+
 void RandMatrD(int** matr, int m, int n, int lf, int rt)
 {
 	srand(time(0));
@@ -42,7 +43,6 @@ int factorial(int a)
 		k = k * a;
 	return k;
 }
-
 void CreateMassivPuti(int n, int begin, int* massiv)
 {
 	int m = 1;
@@ -70,14 +70,13 @@ int PricePuti(int** matr, int* massiv, int n, int begin)
 }
 void Perebor(int** matr, int n, int begin)
 {
-
+	//
 }
 int main()
 {
 	int** matrix;
 	int Gorod,Begin;
 	int* massiv;
-	
 	std::cout << "Vvedite Kolichestvo gorodov - ";
 	std::cin >> Gorod;
 	puts("");
