@@ -43,6 +43,25 @@ int factorial(int a)
 		k = k * a;
 	return k;
 }
+void PutMasPtr(int* a, int n)
+{
+	for (int* p = a; p < a + n; p++)
+		scanf_s("%d", &*p);
+}
+void sheiker(int* massiv, int L,int R)
+{
+	while (L <= R)
+	{
+		for (int i = L; i < R; i++)
+			if (massiv[i] > massiv[i + 1])
+				swap(massiv[i], massiv[i + 1]);
+		R--;
+		for (int i = R; i > L; i--)
+			if (massiv[i] < massiv[i - 1])
+				swap(massiv[i], massiv[i - 1]);
+		L++;
+	}
+}
 void CreateMassivPuti(int n, int begin, int* massiv)
 {
 	int m = 1;
@@ -68,14 +87,30 @@ int PricePuti(int** matr, int* massiv, int n, int begin)
 	}
 	return sum;
 }
-void Perebor(int** matr, int n, int begin)
+void Perebor(int** matr,int *massiv, int n, int begin)
 {
-	//
+	int i_max = 1, j_max = 1;
+	for (int i = 1; i < n-1 ; i++)
+		if (massiv[i] > massiv[i_max] && massiv[i] < massiv[i + 1])
+			i_max = i;
+	std::cout << "\n" << i_max;
+	if(i_max!=0)
+	{
+		for(int j=i_max+1;(j>i_max && j<=n-1); j++)
+			if(massiv[j] > massiv[j_max] && massiv[i_max] < massiv[j])
+				j_max = j;
+	}
+	std::cout << "\n" << j_max;
+	puts("");
+	swap(massiv[j_max], massiv[i_max]);
+	sheiker(massiv, i_max + 1, n-1);
+	for(int i=0;i<n+1;i++)
+		std::cout << " " << massiv[i];
 }
 int main()
 {
 	int** matrix;
-	int Gorod,Begin;
+	int Gorod, Begin, k = 0;
 	int* massiv;
 	std::cout << "Vvedite Kolichestvo gorodov - ";
 	std::cin >> Gorod;
@@ -90,9 +125,15 @@ int main()
 	RandMatrD(matrix, Gorod, Gorod, 1, 100);
 	//InputMatrD(matrix, Gorod, Gorod);
 	OutputMatrD(matrix, Gorod, Gorod);
-	//Perebor(matrix, Gorod, Begin);
+	//PutMasPtr(massiv, Gorod + 1);
 	CreateMassivPuti(Gorod, Begin, massiv);
 	/*int sum = PricePuti(matrix, massiv, Gorod, Begin);
 	std::cout << "\n" << sum;*/
+	puts("");
+	while (k!= factorial(Gorod-1))
+	{
+		Perebor(matrix, massiv, Gorod, Begin);
+		k++;
+	}
 	delete[] massiv;
 }
