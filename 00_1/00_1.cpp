@@ -4,11 +4,11 @@
 #include <time.h>
 #include <iostream>
 
-void RandMatrD(int** matr, int m, int n, int lf, int rt)
+void randMatrD(int** matr, int m, int lf, int rt)
 {
 	srand(time(0));
 	for (int i = 0; i < m; i++)
-		for (int j = 0; j < n; j++)
+		for (int j = 0; j < m; j++)
 		{
 			if (i == j)
 				matr[i][j] = 0;
@@ -16,16 +16,16 @@ void RandMatrD(int** matr, int m, int n, int lf, int rt)
 				matr[i][j] = rand() % (rt - lf + 1) + lf;
 		}
 }
-void InputMatrD(int** matr, int m, int n)
+void inputMatrD(int** matr, int m, int n)
 {
 	for (int i = 0; i < m; i++)
 		for (int j = 0; j < n; j++) scanf_s(" %d", &matr[i][j]);
 }
-void OutputMatrD(int** matr, int m, int n)
+void outputMatrD(int** matr, int m)
 {
 	for (int i = 0; i < m; i++)
 	{
-		for (int j = 0; j < n; j++) printf(" % 4d", matr[i][j]);
+		for (int j = 0; j < m; j++) printf(" % 4d", matr[i][j]);
 		printf("\n");
 	}
 }
@@ -43,6 +43,12 @@ int factorial(int a)
 		k = k * a;
 	return k;
 }
+void copyMatrix(int **matrix,int **matrixCopy,int n)
+{
+	for (int i = 0; i < n; i++)
+		for (int j = 0; j < n; j++)
+			matrixCopy[i][j] = matrix[i][j];
+}
 void sheiker(int* massiv, int L,int R)
 {
 	while (L <= R)
@@ -57,7 +63,7 @@ void sheiker(int* massiv, int L,int R)
 		L++;
 	}
 }
-void CreateMassivPuti(int n, int begin, int* massiv)
+void createMassivWay(int n, int begin, int* massiv)
 {
 	int m = 1;
 	massiv[0] = begin;
@@ -71,7 +77,7 @@ void CreateMassivPuti(int n, int begin, int* massiv)
 		}
 	}
 }
-int PricePuti(int** matr, int* massiv, int n)
+int priceWay(int** matr, int* massiv, int n)
 {
 	int sum = 0;
 	for (int i = 1; i < n + 1; i++)
@@ -80,25 +86,34 @@ int PricePuti(int** matr, int* massiv, int n)
 	}
 	return sum;
 }
-void Perebor(int** matr,int *massiv, int n)
+void perebor(int** matr,int *massiv, int n)
 {
 	int i_max = 1, j_max = 1;
 	for (int i = 2; i < n-1 ; i++)
 		if (massiv[i] > 0 && massiv[i] < massiv[i + 1])
 			i_max = i;
-	//std::cout << "\n" << i_max;
 	for(int j=i_max+1;(j>i_max && j<=n-1); j++)
 		if(massiv[i_max] < massiv[j])
 			j_max = j;
-	//std::cout << "\n" << j_max;
 	swap(massiv[j_max], massiv[i_max]);
 	sheiker(massiv, i_max + 1, n-1);
 }
+void delStrStl(int** matrix,int n, int line, int column)
+{
+	for (int i = 0; i < n; i++)
+	{
+		matrix[line][i] = 0;
+	}
+	for (int i = 0; i < n; i++)
+	{
+		matrix[i][column] = 0;
+	}
+}
 int main()
 {
-	int** matrix;
-	int Gorod, Begin, k = 0, Price_Max = 0, Price_Min = 0;
-	int* massiv;
+	int** matrix; int** matrixCopy;
+	int *massiv,*masEvristika;
+	int Gorod, Begin, sumWay = 1,sumWayEvr = 1, priceMax = 0, priceMin = 0, sumEvristika = 0;
 	std::cout << "Vvedite Kolichestvo gorodov - ";
 	std::cin >> Gorod;
 	puts("");
@@ -106,37 +121,110 @@ int main()
 	std::cin >> Begin;
 	puts("");
 	massiv = new int[Gorod + 1];
+	masEvristika = new int[Gorod + 1];
 	matrix = new int* [Gorod];
 	for (int i = 0; i < Gorod; i++)
 		matrix[i] = new int[Gorod];
-	RandMatrD(matrix, Gorod, Gorod, 1, 100);
-	OutputMatrD(matrix, Gorod, Gorod);
-	CreateMassivPuti(Gorod, Begin, massiv);
-	if(Gorod < 6)
+	randMatrD(matrix, Gorod, 1, 100);
+	outputMatrD(matrix, Gorod);
+	createMassivWay(Gorod, Begin, massiv);
+	if(Gorod < 1)
 		for (int i = 0; i < Gorod + 1; i++)
 			std::cout << massiv[i] << " ";
-	Price_Min = PricePuti(matrix,massiv,Gorod);
-	Price_Max = PricePuti(matrix, massiv, Gorod);
-	if(Gorod<6)
-		std::cout << "  Ssuma Puti = " << Price_Max << "\n";
-	while (k!= factorial((Gorod-1)) - 1) 
+	priceMin = priceWay(matrix,massiv,Gorod);
+	priceMax = priceWay(matrix, massiv, Gorod);
+	if(Gorod<1)
+		std::cout << "  Ssuma Puti = " << priceMax << "\n";
+	while (sumWay!= factorial((Gorod-1))) 
 	{
 		int Price;
-		Perebor(matrix, massiv, Gorod);
-		if (Gorod < 6)
+		perebor(matrix, massiv, Gorod);
+		Price = priceWay(matrix, massiv, Gorod);
+		if (Gorod < 1)
+		{
 			for (int i = 0; i < Gorod + 1; i++)
 				std::cout << massiv[i] << " ";
-		Price = PricePuti(matrix, massiv, Gorod);
-		if(Gorod < 6)
 			std::cout << "  Ssuma Puti = " << Price << "\n";
-		if (Price > Price_Max)
-			Price_Max = Price;
-		if (Price < Price_Min)
-			Price_Min = Price;
-		k++;
+		}
+		if (Price > priceMax)
+			priceMax = Price;
+		if (Price < priceMin)
+			priceMin = Price;
+		sumWay++;
 	}
-	std::cout << "\n" << "Minimalni put = " << Price_Min << "\n" << "Maximalni put = " << Price_Max;
+	std::cout << "\n" << "Minimalni put = " << priceMin << "\n" << "Maximalni put = " << priceMax;
+	puts("");
 	delete[] massiv;
+	masEvristika[0] = Begin;
+	masEvristika[Gorod] = Begin;
+	matrixCopy = new int* [Gorod];
+	for (int i = 0; i < Gorod; i++)
+		matrixCopy[i] = new int[Gorod];
+	copyMatrix(matrix, matrixCopy, Gorod);
+	while (sumWayEvr < Gorod)
+	{
+		int minCol = 0;
+			minCol = 0;
+			for (int j = 1; j <= Gorod; j++)
+			{
+				if (matrix[Begin - 1][minCol] == 0)
+					minCol++;
+				if (matrix[Begin - 1][j] < matrix[Begin - 1][minCol] && matrix[Begin - 1][j] > 0)
+					minCol = j;
+			}
+			masEvristika[sumWayEvr] = minCol + 1;
+			for(int proverka=0;proverka<sumWayEvr;proverka++)
+				if (masEvristika[proverka] == minCol + 1)
+				{
+					matrix[Begin - 1][minCol] = 0;
+					minCol = Begin - 1;
+					sumWayEvr--;
+				}
+			std::cout << matrix[Begin - 1][minCol] << "\n" << Begin << " " << minCol + 1 <<"\n" << sumWayEvr <<"\n" << "\n";
+			if(minCol+1 != Begin)
+				delStrStl(matrix, Gorod, Begin - 1, minCol);
+			//outputMatrD(matrix, Gorod);
+			matrix[minCol][Begin - 1] = 0;
+			Begin = minCol + 1;
+			sumWayEvr++;
+	}
+	for (int i = 0; i <= Gorod; i++)
+		std::cout << masEvristika[i]<< " ";
+	sumEvristika = priceWay(matrixCopy, masEvristika, Gorod);
+	std::cout << "\nSumEvristika = " << sumEvristika;
+	delete[] masEvristika;
 	for (int i = 0; i < Gorod; i++) delete[] matrix[i];
 	delete[] matrix;
+	for (int i = 0; i < Gorod; i++) delete[] matrixCopy[i];
+	delete[] matrixCopy;
 }
+
+
+
+
+
+
+
+
+
+/*
+for (int i = 0; i < Gorod; i++)
+{
+	int minStr = 0, minStl = 0;
+	for (int j = 1; j <= Gorod; j++)
+	{
+		if (matrix[Begin - 1][minStl] == 0)
+			minStl++;
+		if (matrix[Begin - 1][j] < matrix[Begin - 1][minStl] && matrix[Begin - 1][j] > 0)
+			minStl = j;
+	}
+	sumEvristika = sumEvristika + matrix[Begin - 1][minStl];
+	delStrStl(matrix, Gorod, Begin - 1, minStl);
+	outputMatrD(matrix, Gorod);
+	std::cout << Begin << " " << minStl + 1 << " " << sumEvristika << "\n";
+	matrix[minStl][Begin - 1] = 0;
+	Begin = minStl + 1;
+	std::cout << Begin;
+	puts("");
+
+}*/
