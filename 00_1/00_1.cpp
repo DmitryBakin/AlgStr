@@ -49,6 +49,11 @@ void copyMatrix(int **matrix,int **matrixCopy,int n)
 		for (int j = 0; j < n; j++)
 			matrixCopy[i][j] = matrix[i][j];
 }
+void copyMassiv(int* massiv, int* masCopy, int n)
+{
+	for (int i = 0; i < n; i++)
+		masCopy[i] = massiv[i];
+}
 void sheiker(int* massiv, int L,int R)
 {
 	while (L <= R)
@@ -112,8 +117,9 @@ void delStrStl(int** matrix,int n, int line, int column)
 int main()
 {
 	int** matrix; int** matrixCopy;
-	int *massiv,*masEvristika;
+	int *massiv,*masEvristika,*masMin,*masMax;
 	int Gorod, Begin, sumWay = 1,sumWayEvr = 1, priceMax = 0, priceMin = 0, sumEvristika = 0;
+	clock_t start, stop; double T1, T2;
 	std::cout << "Vvedite Kolichestvo gorodov - ";
 	std::cin >> Gorod;
 	puts("");
@@ -121,12 +127,17 @@ int main()
 	std::cin >> Begin;
 	puts("");
 	massiv = new int[Gorod + 1];
+	masMin = new int[Gorod + 1];
+	masMax = new int[Gorod + 1];
 	masEvristika = new int[Gorod + 1];
 	matrix = new int* [Gorod];
 	for (int i = 0; i < Gorod; i++)
 		matrix[i] = new int[Gorod];
 	randMatrD(matrix, Gorod, 1, 100);
 	outputMatrD(matrix, Gorod);
+	//copyMassiv(massiv, masMax, Gorod + 1);
+	//copyMassiv(massiv, masMin, Gorod + 1);
+	start = clock();
 	createMassivWay(Gorod, Begin, massiv);
 	if(Gorod < 1)
 		for (int i = 0; i < Gorod + 1; i++)
@@ -147,20 +158,31 @@ int main()
 			std::cout << "  Ssuma Puti = " << Price << "\n";
 		}
 		if (Price > priceMax)
+		{
 			priceMax = Price;
+		}
 		if (Price < priceMin)
+		{
 			priceMin = Price;
+		}
 		sumWay++;
 	}
-	std::cout << "\n" << "Minimalni put = " << priceMin << "\n" << "Maximalni put = " << priceMax;
+	stop = clock();
+	T1 = (double)(stop - start) / CLOCKS_PER_SEC;
+	std::cout << "\n" << "Minimalni put = " << priceMin ;
+	std::cout << "\n" << "Maximalni put = " << priceMax ;
+	std::cout << "\n" << "Vremya raboti tochnogo algoritma = " << T1;
 	puts("");
 	delete[] massiv;
+	delete[] masMax;
+	delete[] masMin;
 	masEvristika[0] = Begin;
 	masEvristika[Gorod] = Begin;
 	matrixCopy = new int* [Gorod];
 	for (int i = 0; i < Gorod; i++)
 		matrixCopy[i] = new int[Gorod];
 	copyMatrix(matrix, matrixCopy, Gorod);
+	start = clock();
 	while (sumWayEvr < Gorod)
 	{
 		int minCol = 0;
@@ -180,7 +202,7 @@ int main()
 					minCol = Begin - 1;
 					sumWayEvr--;
 				}
-			std::cout << matrix[Begin - 1][minCol] << "\n" << Begin << " " << minCol + 1 <<"\n" << sumWayEvr <<"\n" << "\n";
+			//std::cout << matrix[Begin - 1][minCol] << "\n" << Begin << " " << minCol + 1 <<"\n" << sumWayEvr <<"\n" << "\n";
 			if(minCol+1 != Begin)
 				delStrStl(matrix, Gorod, Begin - 1, minCol);
 			//outputMatrD(matrix, Gorod);
@@ -188,43 +210,25 @@ int main()
 			Begin = minCol + 1;
 			sumWayEvr++;
 	}
-	for (int i = 0; i <= Gorod; i++)
-		std::cout << masEvristika[i]<< " ";
+	stop = clock();
+	T2 = (double)(stop - start) / CLOCKS_PER_SEC;
+	//for (int i = 0; i <= Gorod; i++)
+		//std::cout << masEvristika[i]<< " ";
 	sumEvristika = priceWay(matrixCopy, masEvristika, Gorod);
 	std::cout << "\nSumEvristika = " << sumEvristika;
+	std::cout << "\n" << "Vremya raboti evristiki = " << T2;
+
+	double percent;
+	if (priceMax == priceMin)
+		std::cout << "\n" << "Tochost vipolnenia = 100%";
+	else
+	{
+		percent = (1. - (1.0 * (sumEvristika - priceMin) / (priceMax - priceMin))) * 100;
+		std::cout << "\n" << "\n" << "Tochost vipolnenia = " << percent << "%";
+	}
 	delete[] masEvristika;
 	for (int i = 0; i < Gorod; i++) delete[] matrix[i];
 	delete[] matrix;
 	for (int i = 0; i < Gorod; i++) delete[] matrixCopy[i];
 	delete[] matrixCopy;
 }
-
-
-
-
-
-
-
-
-
-/*
-for (int i = 0; i < Gorod; i++)
-{
-	int minStr = 0, minStl = 0;
-	for (int j = 1; j <= Gorod; j++)
-	{
-		if (matrix[Begin - 1][minStl] == 0)
-			minStl++;
-		if (matrix[Begin - 1][j] < matrix[Begin - 1][minStl] && matrix[Begin - 1][j] > 0)
-			minStl = j;
-	}
-	sumEvristika = sumEvristika + matrix[Begin - 1][minStl];
-	delStrStl(matrix, Gorod, Begin - 1, minStl);
-	outputMatrD(matrix, Gorod);
-	std::cout << Begin << " " << minStl + 1 << " " << sumEvristika << "\n";
-	matrix[minStl][Begin - 1] = 0;
-	Begin = minStl + 1;
-	std::cout << Begin;
-	puts("");
-
-}*/
