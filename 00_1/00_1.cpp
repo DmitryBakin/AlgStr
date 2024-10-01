@@ -49,11 +49,6 @@ void copyMatrix(int **matrix,int **matrixCopy,int n)
 		for (int j = 0; j < n; j++)
 			matrixCopy[i][j] = matrix[i][j];
 }
-void copyMassiv(int* massiv, int* masCopy, int n)
-{
-	for (int i = 0; i < n; i++)
-		masCopy[i] = massiv[i];
-}
 void sheiker(int* massiv, int L,int R)
 {
 	while (L <= R)
@@ -91,7 +86,7 @@ int priceWay(int** matr, int* massiv, int n)
 	}
 	return sum;
 }
-void perebor(int** matr,int *massiv, int n)
+void dijkAlg(int** matr,int *massiv, int n)
 {
 	int i_max = 1, j_max = 1;
 	for (int i = 2; i < n-1 ; i++)
@@ -114,121 +109,147 @@ void delStrStl(int** matrix,int n, int line, int column)
 		matrix[i][column] = 0;
 	}
 }
-int main()
+int  heuristic(int **matrix,int city,int Begin)
 {
-	int** matrix; int** matrixCopy;
-	int *massiv,*masEvristika,*masMin,*masMax;
-	int Gorod, Begin, sumWay = 1,sumWayEvr = 1, priceMax = 0, priceMin = 0, sumEvristika = 0;
-	clock_t start, stop; double T1, T2;
-	std::cout << "Vvedite Kolichestvo gorodov - ";
-	std::cin >> Gorod;
-	puts("");
-	std::cout << "Vvedite gorod-Nachalo ";
-	std::cin >> Begin;
-	puts("");
-	massiv = new int[Gorod + 1];
-	masMin = new int[Gorod + 1];
-	masMax = new int[Gorod + 1];
-	masEvristika = new int[Gorod + 1];
-	matrix = new int* [Gorod];
-	for (int i = 0; i < Gorod; i++)
-		matrix[i] = new int[Gorod];
-	randMatrD(matrix, Gorod, 1, 100);
-	outputMatrD(matrix, Gorod);
-	//copyMassiv(massiv, masMax, Gorod + 1);
-	//copyMassiv(massiv, masMin, Gorod + 1);
-	start = clock();
-	createMassivWay(Gorod, Begin, massiv);
-	if(Gorod < 1)
-		for (int i = 0; i < Gorod + 1; i++)
-			std::cout << massiv[i] << " ";
-	priceMin = priceWay(matrix,massiv,Gorod);
-	priceMax = priceWay(matrix, massiv, Gorod);
-	if(Gorod<1)
-		std::cout << "  Ssuma Puti = " << priceMax << "\n";
-	while (sumWay!= factorial((Gorod-1))) 
-	{
-		int Price;
-		perebor(matrix, massiv, Gorod);
-		Price = priceWay(matrix, massiv, Gorod);
-		if (Gorod < 1)
-		{
-			for (int i = 0; i < Gorod + 1; i++)
-				std::cout << massiv[i] << " ";
-			std::cout << "  Ssuma Puti = " << Price << "\n";
-		}
-		if (Price > priceMax)
-		{
-			priceMax = Price;
-		}
-		if (Price < priceMin)
-		{
-			priceMin = Price;
-		}
-		sumWay++;
-	}
-	stop = clock();
-	T1 = (double)(stop - start) / CLOCKS_PER_SEC;
-	std::cout << "\n" << "Minimalni put = " << priceMin ;
-	std::cout << "\n" << "Maximalni put = " << priceMax ;
-	std::cout << "\n" << "Vremya raboti tochnogo algoritma = " << T1;
-	puts("");
-	delete[] massiv;
-	delete[] masMax;
-	delete[] masMin;
-	masEvristika[0] = Begin;
-	masEvristika[Gorod] = Begin;
-	matrixCopy = new int* [Gorod];
-	for (int i = 0; i < Gorod; i++)
-		matrixCopy[i] = new int[Gorod];
-	copyMatrix(matrix, matrixCopy, Gorod);
-	start = clock();
-	while (sumWayEvr < Gorod)
+	int* masHeuristic;
+	int sumWayHeuristic = 1, sumHeuristic = 0;
+	int** matrixCopy;
+	masHeuristic = new int[city + 1];
+	masHeuristic[0] = Begin;
+	masHeuristic[city] = Begin;
+	matrixCopy = new int* [city];
+	for (int i = 0; i < city; i++)
+		matrixCopy[i] = new int[city];
+	copyMatrix(matrix, matrixCopy, city);
+	while (sumWayHeuristic < city)
 	{
 		int minCol = 0;
-			minCol = 0;
-			for (int j = 1; j <= Gorod; j++)
+		for (int j = 1; j <= city; j++)
+		{
+			if (matrix[Begin - 1][minCol] == 0)
+				minCol++;
+			if (matrix[Begin - 1][j] < matrix[Begin - 1][minCol] && matrix[Begin - 1][j] > 0)
+				minCol = j;
+		}
+		masHeuristic[sumWayHeuristic] = minCol + 1;
+		for (int test = 0; test < sumWayHeuristic; test++)
+			if (masHeuristic[test] == minCol + 1)
 			{
-				if (matrix[Begin - 1][minCol] == 0)
-					minCol++;
-				if (matrix[Begin - 1][j] < matrix[Begin - 1][minCol] && matrix[Begin - 1][j] > 0)
-					minCol = j;
+				matrix[Begin - 1][minCol] = 0;
+				minCol = Begin - 1;
+				sumWayHeuristic--;
 			}
-			masEvristika[sumWayEvr] = minCol + 1;
-			for(int proverka=0;proverka<sumWayEvr;proverka++)
-				if (masEvristika[proverka] == minCol + 1)
-				{
-					matrix[Begin - 1][minCol] = 0;
-					minCol = Begin - 1;
-					sumWayEvr--;
-				}
-			//std::cout << matrix[Begin - 1][minCol] << "\n" << Begin << " " << minCol + 1 <<"\n" << sumWayEvr <<"\n" << "\n";
-			if(minCol+1 != Begin)
-				delStrStl(matrix, Gorod, Begin - 1, minCol);
-			//outputMatrD(matrix, Gorod);
-			matrix[minCol][Begin - 1] = 0;
-			Begin = minCol + 1;
-			sumWayEvr++;
+		//std::cout << matrix[Begin - 1][minCol] << "\n" << Begin << " " << minCol + 1 <<"\n" << sumWayEvr <<"\n" << "\n";
+		if (minCol + 1 != Begin)
+			delStrStl(matrix, city, Begin - 1, minCol);
+		//puts("");
+		//outputMatrD(matrix, city);
+		matrix[minCol][Begin - 1] = 0;
+		Begin = minCol + 1;
+		sumWayHeuristic++;
 	}
-	stop = clock();
-	T2 = (double)(stop - start) / CLOCKS_PER_SEC;
-	//for (int i = 0; i <= Gorod; i++)
-		//std::cout << masEvristika[i]<< " ";
-	sumEvristika = priceWay(matrixCopy, masEvristika, Gorod);
-	std::cout << "\nSumEvristika = " << sumEvristika;
-	std::cout << "\n" << "Vremya raboti evristiki = " << T2;
-
+	sumHeuristic = priceWay(matrixCopy, masHeuristic, city);
+	std::cout << "\n" << "Heuristic way massiv: ";
+	for (int i = 0; i <= city; i++)
+		std::cout << masHeuristic[i] << " ";
+	delete[] masHeuristic;
+	return sumHeuristic;
+}
+void percent(int priceMin, int priceMax, int price)
+{
 	double percent;
 	if (priceMax == priceMin)
-		std::cout << "\n" << "Tochost vipolnenia = 100%";
+		std::cout << "\n" << "accuracy of execution = 100%";
 	else
 	{
-		percent = (1. - (1.0 * (sumEvristika - priceMin) / (priceMax - priceMin))) * 100;
-		std::cout << "\n" << "\n" << "Tochost vipolnenia = " << percent << "%";
+		percent = (1. - (1.0 * (price - priceMin) / (priceMax - priceMin))) * 100;
+		std::cout << "\n" << "\n" << "accuracy of execution = " << percent << "%";
 	}
-	delete[] masEvristika;
-	for (int i = 0; i < Gorod; i++) delete[] matrix[i];
-	delete[] matrix;
-	for (int i = 0; i < Gorod; i++) delete[] matrixCopy[i];
-	delete[] matrixCopy;
+}
+int main()
+{
+	for (int j=0;j<2;j++)
+	{
+		int Begin, city;
+		std::cout << "Enter the number of cities - ";
+		std::cin >> city;
+		puts("");
+		std::cout << "Enter your starting city ";
+		std::cin >> Begin;
+		puts("");
+		int** matrix; int** matrixCopy;
+		int* massiv; int* masHeuristic; int* masMax; int* masMin;
+		int price = 0, priceMax = 0, priceMin = 0, sumHeuristic = 0, sumWay = 1;
+		clock_t start, stop; double time1, time2;
+		matrix = new int* [city];
+		for (int i = 0; i < city; i++)
+			matrix[i] = new int[city];
+		massiv = new int[city + 1];
+		masMax = new int[city + 1];
+		masMin = new int[city + 1];
+		randMatrD(matrix, city, 1, 100);
+		outputMatrD(matrix, city);
+		createMassivWay(city, Begin, massiv);
+		start = clock();
+		priceMin = priceWay(matrix, massiv, city);
+		priceMax = priceWay(matrix, massiv, city);
+		for (int i = 0; i < city + 1; i++)
+			masMax[i] = massiv[i];
+		for (int i = 0; i < city + 1; i++)
+			masMin[i] = massiv[i];
+		/*if (city < 5)
+		{
+			for (int i = 0; i < city + 1; i++)
+				std::cout << massiv[i] << " ";
+			std::cout << "  the sum of the Way = " << priceMax << "\n";
+			}*/
+		while (sumWay != factorial((city - 1)))
+		{
+			int price;
+			dijkAlg(matrix, massiv, city);
+			price = priceWay(matrix, massiv, city);
+			/*if (city < 5)
+			{
+				for (int i = 0; i < city + 1; i++)
+					std::cout << massiv[i] << " ";
+				std::cout << "  the sum of the Way = " << price << "\n";
+			}*/
+			if (price > priceMax)
+			{
+				priceMax = price;
+				for (int i = 0; i < city + 1; i++)
+					masMax[i] = massiv[i];
+			}
+			if (price < priceMin)
+			{
+				priceMin = price;
+				for (int i = 0; i < city + 1; i++)
+					masMin[i] = massiv[i];
+			}
+				sumWay++;
+		}
+		std::cout << "\n" << "The min Way = " << priceMin << "\n" << "Minimum way: ";
+		for (int i = 0; i <= city; i++)
+			std::cout << masMin[i] << " ";
+		std::cout << "\n" << "The max Way = " << priceMax << "\n" << "Maximum way: ";
+		for (int i = 0; i <= city; i++)
+			std::cout << masMax[i] << " ";
+		puts("");
+		delete[] massiv;
+		stop = clock();
+		time1 = (double)(stop - start) / CLOCKS_PER_SEC;
+		std::cout << "the running time of the exact algorithm = " << time1;
+		puts("");
+		start = clock();
+		sumHeuristic = heuristic(matrix, city, Begin);
+		stop = clock();
+		time2 = (double)(stop - start) / CLOCKS_PER_SEC;
+		std::cout << "\nThe Way in heuristic = " << sumHeuristic;
+		std::cout << "\n" << "the running time of the heuristic algorithm = " << time2;
+		percent(priceMin, priceMax, sumHeuristic);
+		for (int i = 0; i < city; i++)
+			delete[] matrix[i];
+		delete[] matrix;
+		puts("\n--------------------------------------------------");
+		}
 }
