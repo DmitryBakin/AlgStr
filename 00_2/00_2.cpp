@@ -1,7 +1,7 @@
 ﻿#include <iostream>
 #include <string.h>
 #include <vector>
-int findAll(std::string str, std::string substr)
+int findAll(std::string const str, std::string const substr)
 {
 	int table[256], strLen = str.size(), substrLen = substr.size(), index = substrLen - 1, indexSubstr, indexStr;
 	for (int i = 0; i < 256; i++)
@@ -36,7 +36,7 @@ int findAll(std::string str, std::string substr)
 		return -1;
 	
 }
-std::vector<int> findAll(std::string str, std::string substr,int leftBorder, int rightBorder)
+std::vector<int> findAll(std::string const str, std::string const substr,int const leftBorder, int const rightBorder)
 {
 	std::string strCopy(str.begin() + leftBorder, str.begin() + rightBorder + 1);
 	int table[256], strLen = strCopy.size(), substrLen = substr.size(), index = substrLen - 1, indexSubstr, indexStr;
@@ -75,18 +75,27 @@ void main()
 	std::string str("std::move_iterator is an iterator adaptor which behaves exactly like the underlying iterator");
 	std::string substr("tor");
 	std::vector<int> masEntr;
-	std::vector<int> masEntr2;
 	masEntr = findAll(str, substr, 0, 91);
-	for(int i=0;i<masEntr.size();i++)
+	std::cout << "findAll(0, 91) = [ ";
+	for (int i = 0; i < masEntr.size(); i++) 
 		std::cout << masEntr[i] << " ";
+	std::cout << "]";
 	puts("\n--------------------------");
-	masEntr2 = findAll(str, substr, 28, 36);
-	for (int i = 0; i < masEntr2.size(); i++)
-		std::cout << masEntr2[i] << " ";
+	masEntr = findAll(str, substr, 28, 36);
+	std::cout << "findAll(28, 36) = [ ";
+	for (int i = 0; i < masEntr.size(); i++)
+		std::cout << masEntr[i] << " ";
+	std::cout << "]";
+	puts("\n--------------------------");
+	masEntr = findAll(str, substr, 17, 91);
+	std::cout << "findAll(17, 91) = [ ";
+	for (int i = 0; i < masEntr.size(); i++)
+		std::cout << masEntr[i] << " ";
+	std::cout << "]";
 	puts("\n--------------------------");
 	if (findAll(str, substr) != -1)
 		std::cout << "First entry index = " << findAll(str, substr);
 	else
 		std::cout << "No entries found";
-
+	puts("\n--------------------------");
 }
