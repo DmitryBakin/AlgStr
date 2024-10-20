@@ -1,9 +1,11 @@
 ﻿#include <iostream>
 #include <string.h>
 #include <vector>
-int findAll(std::string const str, std::string const substr)
+int findFirst(std::string& const str, std::string& const substr)
 {
-	int table[256], strLen = str.size(), substrLen = substr.size(), index = substrLen - 1, indexSubstr, indexStr;
+	int table[256];
+	int strLen = str.size(), substrLen = substr.size();
+	int index = substrLen - 1, indexSubstr, indexStr;
 	for (int i = 0; i < 256; i++)
 		table[i] = substrLen;
 	for (int i = 0; i < substrLen - 1; i++)
@@ -21,7 +23,7 @@ int findAll(std::string const str, std::string const substr)
 			}
 			else
 			{
-				index = indexStr + table[str[indexStr]];
+				index += table[str[index]];
 				break;
 			}
 		}
@@ -29,44 +31,19 @@ int findAll(std::string const str, std::string const substr)
 			break;
 	}
 	if (indexSubstr == -1)
-	{
 		return index - substrLen + 1;
-	}
 	else
 		return -1;
-	
 }
-std::vector<int> findAll(std::string const str, std::string const substr,int const leftBorder, int const rightBorder)
+std::vector<int> findAll(std::string& const str, std::string& const substr, int const leftBorder, int const rightBorder)
 {
 	std::string strCopy(str.begin() + leftBorder, str.begin() + rightBorder + 1);
-	int table[256], strLen = strCopy.size(), substrLen = substr.size(), index = substrLen - 1, indexSubstr, indexStr;
 	std::vector<int> masEntr;
-	for (int i = 0; i < 256; i++)
-		table[i] = substrLen;
-	for (int i = 0; i < substrLen - 1; i++)
-		table[substr[i]] = substrLen - 1 - i;
-	while (index < strLen)
+	int entr = findFirst(strCopy, substr);
+	while(entr != -1)
 	{
-		indexStr = index;
-		indexSubstr = substrLen - 1;
-		while (indexSubstr >= 0)
-		{
-			if (strCopy[indexStr] == substr[indexSubstr])
-			{
-				indexStr--;
-				indexSubstr--;
-			}
-			else
-			{
-				index = indexStr + table[strCopy[indexStr]];
-				break;
-			}
-		}
-		if (indexSubstr == -1)
-		{
-			masEntr.push_back(index - substrLen + leftBorder + 1);
-			index++;
-		}
+		masEntr.push_back(entr+leftBorder);
+		entr = strCopy.find(substr, entr + 1);
 	}
 	return masEntr;
 }
@@ -75,6 +52,12 @@ void main()
 	std::string str("std::move_iterator is an iterator adaptor which behaves exactly like the underlying iterator");
 	std::string substr("tor");
 	std::vector<int> masEntr;
+	if (findFirst(str, substr) != -1)
+		std::cout << "First entry index = " << findFirst(str, substr);
+	else
+		std::cout << "No entries found";
+	puts("\n--------------------------");
+
 	masEntr = findAll(str, substr, 0, 91);
 	std::cout << "findAll(0, 91) = [ ";
 	for (int i = 0; i < masEntr.size(); i++) 
@@ -92,10 +75,5 @@ void main()
 	for (int i = 0; i < masEntr.size(); i++)
 		std::cout << masEntr[i] << " ";
 	std::cout << "]";
-	puts("\n--------------------------");
-	if (findAll(str, substr) != -1)
-		std::cout << "First entry index = " << findAll(str, substr);
-	else
-		std::cout << "No entries found";
 	puts("\n--------------------------");
 }
