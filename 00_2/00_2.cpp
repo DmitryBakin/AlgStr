@@ -37,13 +37,13 @@ int findFirst(std::string& const str, std::string& const substr)
 }
 std::vector<int> findAll(std::string& const str, std::string& const substr, int const leftBorder, int const rightBorder)
 {
-	std::string strCopy(str.begin() + leftBorder, str.begin() + rightBorder + 1);
 	std::vector<int> masEntr;
-	int entr = findFirst(strCopy, substr);
+	int entr = findFirst(str, substr);
 	while(entr != -1)
 	{
-		masEntr.push_back(entr+leftBorder);
-		entr = strCopy.find(substr, entr + 1);
+		if(entr >= leftBorder && entr < rightBorder)
+			masEntr.push_back(entr);
+		entr = str.find(substr, entr + 1);
 	}
 	return masEntr;
 }
