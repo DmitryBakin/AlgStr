@@ -1,8 +1,18 @@
 ﻿#include <iostream>
 #include <string.h>
 #include <vector>
-int findFirst(std::string& const str, std::string& const substr)
+int findFirst(std::string& const str, std::string& const substr,int leftBorder = 0 ,int rightBorder = -1)
 {
+	if (leftBorder < 0)
+	{
+		leftBorder += str.size();
+	}
+	if (rightBorder < 0)
+	{
+		rightBorder += str.size();
+	}
+	if (leftBorder >= rightBorder || leftBorder > str.size() || rightBorder >= str.size())
+		return -1;
 	int table[256];
 	int strLen = str.size(), substrLen = substr.size();
 	int index = substrLen - 1, indexSubstr, indexStr;
@@ -27,14 +37,20 @@ int findFirst(std::string& const str, std::string& const substr)
 				break;
 			}
 		}
-		if (indexSubstr == -1)
+		if (indexSubstr == -1 && index - substrLen + 1 >= leftBorder && index - substrLen + 1 < rightBorder)
 			break;
+		if (indexSubstr == -1 && (index - substrLen + 1 < leftBorder || index - substrLen + 1 > rightBorder))
+			if (strLen > index + substrLen)
+				index++;
+			else 
+				break;
 	}
-	if (indexSubstr == -1)
+	if (indexSubstr == -1 && index - substrLen + 1 >= leftBorder && index - substrLen + 1 < rightBorder)
 		return index - substrLen + 1;
-	else
+	if (indexSubstr == -1 && (index - substrLen + 1 < leftBorder || index - substrLen + 1 > rightBorder))
 		return -1;
 }
+
 std::vector<int> findAll(std::string& const str, std::string& const substr, int const leftBorder, int const rightBorder)
 {
 	std::vector<int> masEntr;
@@ -43,7 +59,7 @@ std::vector<int> findAll(std::string& const str, std::string& const substr, int 
 	{
 		if(entr >= leftBorder && entr < rightBorder)
 			masEntr.push_back(entr);
-		entr = str.find(substr, entr + 1);
+		entr = findFirst(str, substr, entr + 1, rightBorder);
 	}
 	return masEntr;
 }
