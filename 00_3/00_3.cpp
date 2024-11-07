@@ -25,12 +25,11 @@ void randMasD(int* a, int n, int lf, int rt)
 }
 void createStepsArr1(std::vector<int>& stepsArr, int sum)
 {
-	for (int i = 0; sum / 2 != 1; i++)
+	for (int i = 0; sum / 2 > 0; i++)
 	{
 		stepsArr.push_back(sum / 2);
 		sum /= 2;
 	}
-	stepsArr.push_back(sum / 2);
 }
 void createStepsArr2(std::vector<int>& stepsArr, int const sum)
 {
