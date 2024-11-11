@@ -20,7 +20,6 @@ void randMasD(int* array, int size, int lf, int rt)
 {
 	std::random_device rd;
 	std::mt19937 gen(rd());
-	srand(time(0));
 	for (int i = 0; i < size; i++) 
 		array[i] = rd() % (rt - lf + 1) + lf;
 }
@@ -133,6 +132,7 @@ void main()
 			if (checkArray(array, size))
 				std::cout << "\nThe array has been sorted\n";
 			delete[]array;
+			delete[]arrayCopy;
 		}
 	}
 	delete[]files;
