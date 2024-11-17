@@ -16,6 +16,7 @@ bool checkArray(std::vector<int> array)
 
 void recFile(std::vector<int>& array, int const border, int const size)
 {
+	array.clear();
 	std::ifstream file;
 	int value = 0;
 	std::string ch;
@@ -43,8 +44,8 @@ void swap(int& a, int& b)
 
 void sift(std::vector<int>& array, int const size, int index)
 {
-	int j = 2 * index + 1, x = array[index], f = 1;
-	while (j < size && f)
+	int j = 2 * index + 1, x = array[index], stop = 0;
+	while (j < size && !stop)
 	{
 		if (j + 1 < size && array[j + 1] > array[j])
 			j+=1;
@@ -55,7 +56,7 @@ void sift(std::vector<int>& array, int const size, int index)
 			j = 2 * index + 1;
 		}
 		else
-			f = 0;
+			stop = 1;
 	}
 	array[index] = x;
 }
@@ -85,13 +86,11 @@ void sortPyramid(std::vector<int>& array, int const size)
 void main()
 {
 	clock_t start, stop;
-	double time, totalTime;
-	double* arrTime;
-	std::vector<int> array;
+	double time, totalTime = 0;
 	for (int border = 10; border <= 100000; border *= 100)
 		for (int size = 10000; size <= 1000000; size *= 10)
 		{
-			arrTime = new double[3];
+			std::vector<int> array;
 			for (int i = 0; i <= 2; i++)
 			{
 				recFile(array, border, size);
@@ -99,15 +98,10 @@ void main()
 				sortPyramid(array, size);
 				stop = clock();
 				time = (double)(stop - start) / CLOCKS_PER_SEC;
-				arrTime[i] = time;
-				if (i == 2)
-				{
-					totalTime = (arrTime[0] + arrTime[1] + arrTime[2]) / 3;
-					if (checkArray(array))
-						std::cout << "Running time of the pyramid sort(border = " << border << ", size = " << size << ") = " << totalTime << std::endl;
-					delete []arrTime;
-				}
-				array.clear();
+				totalTime += time;
 			}
+			if (checkArray(array))
+				std::cout << "Running time of the pyramid sort(border = " << border << ", size = " << size << ") = " << totalTime / 3. << std::endl;
+			totalTime = 0;
 		}
 }
