@@ -29,15 +29,6 @@ bool searchInVector(std::vector<int>& array, int const value)
     return false;
 }
 
-bool haveCycle(BoolMatrix& bm)
-{
-    for (int i = 0; i < bm.lineCount(); i++)
-        for (int j = 0; j < bm.columnCount(); j++)
-            if (bm[i].bitValue(j) == 1 && bm[j].bitValue(i) == 1)
-                return true;
-    return false;
-}
-
 bool addEdge(BoolMatrix& bm, int const a, int const b)
 {
     if (a == 0)
@@ -48,14 +39,38 @@ bool addEdge(BoolMatrix& bm, int const a, int const b)
 
 bool deleteEdge(BoolMatrix& bm, std::vector<int>& array)
 {
-    if (haveCycle(bm))
-        return false;
-    while (array.size() != bm.columnCount())
+    BoolVector v0(bm.columnCount(), 0);
+    BoolVector v1(bm.columnCount(), 0);
+    BoolVector v2(bm.columnCount(), 0);
+
+    v1 = bm.disjunctionAllLines();
+    v0 = ~v1;
+    for (int i = 0; i < v0.length(); i++)
+        if (v0[i] == 1)
+        {
+            array.push_back(i + 1);
+        }
+    for (int i = 0; i < bm.columnCount(); i++)
+        if (bm.weightColumn(i) == 0)
+        {
+            bm.setComponents(i, 0, bm.columnCount(), 0);
+        }
+
+    while (v0.weight() != v0.length())
     {
-        for (int i = 0; i < bm.columnCount(); i++)
-            if (bm.weightColumn(i) == 0 && !searchInVector(array, i + 1))
+        v1 = bm.disjunctionAllLines();
+        v2 = ~v1 & ~v0;
+        for (int i = 0; i < v2.length(); i++)
+            if (v2[i] == 1 && !searchInVector(array, i + 1))
             {
+                v0[i] = true;
                 array.push_back(i + 1);
+            }
+        if (v2.weight() == 0)
+            return false;
+        for (int i = 0; i < bm.columnCount(); i++)
+            if (bm.weightColumn(i) == 0)
+            {
                 bm.setComponents(i, 0, bm.columnCount(), 0);
             }
     }
