@@ -11,7 +11,7 @@ public:
     int count = 0;
     Trailer* tr;
 
-    bool operator==(const Leader& ld);
+    bool operator==(const Leader& ld) const;
 };
 
 class Trailer
@@ -29,14 +29,27 @@ bool searchInVector(std::vector<int>& array, int const value)
     return false;
 }
 
+bool haveCycle(BoolMatrix& bm)
+{
+    for (int i = 0; i < bm.lineCount(); i++)
+        for (int j = 0; j < bm.columnCount(); j++)
+            if (bm[i].bitValue(j) == 1 && bm[j].bitValue(i) == 1)
+                return true;
+    return false;
+}
+
 bool addEdge(BoolMatrix& bm, int const a, int const b)
 {
+    if (a == 0)
+        return false;
     bm.setComponent(a - 1, b - 1, true);
     return true;
 }
 
-void deleteEdge(BoolMatrix& bm, std::vector<int>& array)
+bool deleteEdge(BoolMatrix& bm, std::vector<int>& array)
 {
+    if (haveCycle(bm))
+        return false;
     while (array.size() != bm.columnCount())
     {
         for (int i = 0; i < bm.columnCount(); i++)
@@ -46,6 +59,7 @@ void deleteEdge(BoolMatrix& bm, std::vector<int>& array)
                 bm.setComponents(i, 0, bm.columnCount(), 0);
             }
     }
+    return true;
 }
 
 void addEdge(List<Leader>& ld, int const a, Leader*& ptrA)
@@ -102,7 +116,7 @@ void transferLd(List<Leader>& ld, List<Leader>& ldNew)
         }
 }
 
-void deleteEdge(List<Leader>& ld, std::vector<int>& array)
+bool deleteEdge(List<Leader>& ld, std::vector<int>& array)
 {
     List<Leader> ldNew;
     transferLd(ld, ldNew);
@@ -124,24 +138,15 @@ void deleteEdge(List<Leader>& ld, std::vector<int>& array)
         delete T;
         array.push_back(p.key);
     }
+
+    if (!ld.isEmpty())
+        return false;
+    return true;
 }
 
-int main()
+bool topologicalSortForBM(BoolMatrix& bm, std::vector<int>& array)
 {
-    List<Leader> ld;
-    BoolMatrix bm(7, 7, false);
-    std::vector<int> array, array1;
-    int a = 1, b = 2, c = 3, d = 4, f = 5,e = 6, j= 7;
-    addEdge(ld, b, a);
-    addEdge(ld, d, f);
-    addEdge(ld, f, a);
-    addEdge(ld, f, c);
-    addEdge(ld, e, b);
-    addEdge(ld, e, c);
-    addEdge(ld, e, f);
-    addEdge(ld, j, a);
-
-
+    int a = 1, b = 2, c = 3, d = 4, f = 5, e = 6, j = 7;
     addEdge(bm, b, a);
     addEdge(bm, d, f);
     addEdge(bm, f, a);
@@ -151,21 +156,59 @@ int main()
     addEdge(bm, e, f);
     addEdge(bm, j, a);
 
-    deleteEdge(bm, array);
-    deleteEdge(ld, array1);
+    if (deleteEdge(bm, array))
+        return true;
+    return false;
+}
 
-    std::cout << "\nTopological sorting via BM:   ";
-    for (int i = 0; i < array.size(); i++)
-        std::cout << array[i] << " ";
-    std::cout << "\nTopological sorting via List: ";
-    for (int i = 0; i < array1.size(); i++)
-        std::cout << array1[i] << " ";
+bool topologicalSortForList(List<Leader>& ld, std::vector<int>& array)
+{
+    int a = 1, b = 2, c = 3, d = 4, f = 5, e = 6, j = 7;
+
+    addEdge(ld, b, a);
+    addEdge(ld, d, f);
+    addEdge(ld, f, a);
+    addEdge(ld, f, c);
+    addEdge(ld, e, b);
+    addEdge(ld, e, c);
+    addEdge(ld, e, f);
+    addEdge(ld, j, a);
+
+    if (deleteEdge(ld, array))
+        return true;
+    return false;
+
+}
+
+int main()
+{
+    List<Leader> ld;
+    BoolMatrix bm(7, 7, false);
+    std::vector<int> array, array1;
+
+    if (topologicalSortForBM(bm,array))
+    {
+        std::cout << "Topological sorting via BM:   ";
+        for (int i = 0; i < array.size(); i++)
+            std::cout << array[i] << " ";
+    }
+    else
+        std::cout << "BM have cycle";
+
+    if (topologicalSortForList(ld, array1))
+    {
+        std::cout << "\nTopological sorting via List: ";
+        for (int i = 0; i < array1.size(); i++)
+            std::cout << array1[i] << " ";
+    }
+    else 
+        std::cout << "\nList have cycle";
 }
 
 
 
 
-bool Leader::operator==(const Leader& ld)
+bool Leader::operator==(const Leader& ld) const
 {
     return (key == ld.key);
 }
