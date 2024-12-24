@@ -29,7 +29,7 @@ bool searchInVector(std::vector<int>& array, int const value)
     return false;
 }
 
-bool addEdge(BoolMatrix& bm, int const a, int const b)
+bool addEdgeForBM(BoolMatrix& bm, int const a, int const b)
 {
     if (a == 0)
         return false;
@@ -37,7 +37,7 @@ bool addEdge(BoolMatrix& bm, int const a, int const b)
     return true;
 }
 
-bool deleteEdge(BoolMatrix& bm, std::vector<int>& array)
+bool deleteEdgeForBM(BoolMatrix& bm, std::vector<int>& array)
 {
     BoolVector v0(bm.columnCount(), 0);
     BoolVector v1(bm.columnCount(), 0);
@@ -49,12 +49,8 @@ bool deleteEdge(BoolMatrix& bm, std::vector<int>& array)
         if (v0[i] == 1)
         {
             array.push_back(i + 1);
-        }
-    for (int i = 0; i < bm.columnCount(); i++)
-        if (bm.weightColumn(i) == 0)
-        {
-            bm.setComponents(i, 0, bm.columnCount(), 0);
-        }
+            bm[i].setValue(0);
+        }        
 
     while (v0.weight() != v0.length())
     {
@@ -71,7 +67,7 @@ bool deleteEdge(BoolMatrix& bm, std::vector<int>& array)
         for (int i = 0; i < bm.columnCount(); i++)
             if (bm.weightColumn(i) == 0)
             {
-                bm.setComponents(i, 0, bm.columnCount(), 0);
+                bm[i].setValue(0);
             }
     }
     return true;
@@ -162,16 +158,17 @@ bool deleteEdge(List<Leader>& ld, std::vector<int>& array)
 bool topologicalSortForBM(BoolMatrix& bm, std::vector<int>& array)
 {
     int a = 1, b = 2, c = 3, d = 4, f = 5, e = 6, j = 7;
-    addEdge(bm, b, a);
-    addEdge(bm, d, f);
-    addEdge(bm, f, a);
-    addEdge(bm, f, c);
-    addEdge(bm, e, b);
-    addEdge(bm, e, c);
-    addEdge(bm, e, f);
-    addEdge(bm, j, a);
+    addEdgeForBM(bm, b, a);
+    addEdgeForBM(bm, d, f);
+    addEdgeForBM(bm, f, a);
+    addEdgeForBM(bm, f, c);
+    addEdgeForBM(bm, e, b);
+    addEdgeForBM(bm, e, c);
+    addEdgeForBM(bm, e, f);
+    addEdgeForBM(bm, j, a);
+    addEdgeForBM(bm, j, j);
 
-    if (deleteEdge(bm, array))
+    if (deleteEdgeForBM(bm, array))
         return true;
     return false;
 }
@@ -188,6 +185,7 @@ bool topologicalSortForList(List<Leader>& ld, std::vector<int>& array)
     addEdge(ld, e, c);
     addEdge(ld, e, f);
     addEdge(ld, j, a);
+    addEdge(ld, j, j);
 
     if (deleteEdge(ld, array))
         return true;
