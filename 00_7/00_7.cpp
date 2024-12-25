@@ -3,24 +3,6 @@
 #include "\O-O-P\boolMatrix\boolMatrix.h"
 #include "\O-O-P\List\List.h"
 
-class Trailer;
-class Leader
-{
-public:
-    int key;
-    int count = 0;
-    Trailer* tr;
-
-    bool operator==(const Leader& ld) const;
-};
-
-class Trailer
-{
-public:
-    Leader *ld;
-    Trailer *nx;
-};
-
 bool searchInVector(std::vector<int>& array, int const value)
 {
     for (int i = 0; i < array.size(); i++)
@@ -29,7 +11,7 @@ bool searchInVector(std::vector<int>& array, int const value)
     return false;
 }
 
-bool addEdgeForBM(BoolMatrix& bm, int const a, int const b)
+bool addEdge(BoolMatrix& bm, int const a, int const b)
 {
     if (a == 0)
         return false;
@@ -37,7 +19,7 @@ bool addEdgeForBM(BoolMatrix& bm, int const a, int const b)
     return true;
 }
 
-bool deleteEdgeForBM(BoolMatrix& bm, std::vector<int>& array)
+bool deleteEdge(BoolMatrix& bm, std::vector<int>& array)
 {
     BoolVector v0(bm.columnCount(), 0);
     BoolVector v1(bm.columnCount(), 0);
@@ -50,7 +32,7 @@ bool deleteEdgeForBM(BoolMatrix& bm, std::vector<int>& array)
         {
             array.push_back(i + 1);
             bm[i].setValue(0);
-        }        
+        }
 
     while (v0.weight() != v0.length())
     {
@@ -73,6 +55,28 @@ bool deleteEdgeForBM(BoolMatrix& bm, std::vector<int>& array)
     return true;
 }
 
+
+class Leader
+{
+public:
+    int key;
+    int count = 0;
+    List<Leader*> trLd;
+
+    Leader();
+    Leader(int key);
+
+    bool operator==(const Leader& ld) const;
+};
+
+Leader::Leader()
+{}
+
+Leader::Leader(int keyA)
+    :key(keyA)
+    ,trLd()
+{}
+
 void addEdge(List<Leader>& ld, int const a, Leader*& ptrA)
 {
     bool search = 0;
@@ -90,9 +94,7 @@ void addEdge(List<Leader>& ld, int const a, Leader*& ptrA)
         ptrA = &ld[j];
     else
     {
-        Leader aLead;
-        aLead.key = a;
-        aLead.count = 0;
+        Leader aLead(a);
         ld.addToHead(aLead);
         ptrA = &ld[j];
     }
@@ -102,16 +104,15 @@ bool addEdge(List<Leader>& ld, int const a, int const b)
 {
     Leader* ptrA = nullptr;
     Leader* ptrB = nullptr;
+
     if (a == 0)
         return false;
+
     addEdge(ld, a, ptrA);
     addEdge(ld, b, ptrB);
 
     ptrB->count++;
-    Trailer* elemTr = new Trailer;
-    elemTr->ld = ptrB;
-    elemTr->nx = ptrA->tr;
-    ptrA->tr = elemTr;
+    ptrA->trLd.addToHead(ptrB);
 
     return true;
 }
@@ -131,22 +132,16 @@ bool deleteEdge(List<Leader>& ld, std::vector<int>& array)
 {
     List<Leader> ldNew;
     transferLd(ld, ldNew);
-    
+
     while (!ldNew.isEmpty())
     {
         Leader p = ldNew[0];
-        Trailer* T = p.tr;
         ldNew.deleteFromHead();
-        while(T != nullptr)
-        {
-            T->ld->count = T->ld->count - 1;
-            if (T->nx != nullptr)
-                T = T->nx;
-            else
-                break;
-        }
+
+        for(List<Leader*>::iterator runner = p.trLd.begin(); runner != p.trLd.end(); runner++)
+            (*runner)->count--;
+
         transferLd(ld, ldNew);
-        delete T;
         array.push_back(p.key);
     }
 
@@ -158,17 +153,16 @@ bool deleteEdge(List<Leader>& ld, std::vector<int>& array)
 bool topologicalSortForBM(BoolMatrix& bm, std::vector<int>& array)
 {
     int a = 1, b = 2, c = 3, d = 4, f = 5, e = 6, j = 7;
-    addEdgeForBM(bm, b, a);
-    addEdgeForBM(bm, d, f);
-    addEdgeForBM(bm, f, a);
-    addEdgeForBM(bm, f, c);
-    addEdgeForBM(bm, e, b);
-    addEdgeForBM(bm, e, c);
-    addEdgeForBM(bm, e, f);
-    addEdgeForBM(bm, j, a);
-    addEdgeForBM(bm, j, j);
+    addEdge(bm, b, a);
+    addEdge(bm, d, f);
+    addEdge(bm, f, a);
+    addEdge(bm, f, c);
+    addEdge(bm, e, b);
+    addEdge(bm, e, c);
+    addEdge(bm, e, f);
+    addEdge(bm, j, a);
 
-    if (deleteEdgeForBM(bm, array))
+    if (deleteEdge(bm, array))
         return true;
     return false;
 }
@@ -185,13 +179,14 @@ bool topologicalSortForList(List<Leader>& ld, std::vector<int>& array)
     addEdge(ld, e, c);
     addEdge(ld, e, f);
     addEdge(ld, j, a);
-    addEdge(ld, j, j);
+
 
     if (deleteEdge(ld, array))
         return true;
     return false;
 
 }
+
 
 int main()
 {
